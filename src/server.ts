@@ -1,23 +1,50 @@
 import mongoose from 'mongoose'
 import app from './app'
 import config from './config'
+import { ErrorLog, SuccessLog } from './shared/log'
+import { Server } from 'http'
+
+process.on('uncaughtException', err => {
+  ErrorLog(err)
+  process.exit(1)
+})
+
+let server: Server
 
 const connectToDb = async () => {
   try {
     if (config.database_url) {
       await mongoose.connect(config.database_url)
 
-      console.log('connected to the db')
+      SuccessLog('connected to the db')
 
-      app.listen(config.port, () => {
-        console.log(`Listening on port ${config.port}`)
+      server = app.listen(config.port, () => {
+        SuccessLog(`Listening on port ${config.port}`)
       })
     } else {
-      console.log('db url needed')
+      SuccessLog('db url needed')
     }
+
+    process.on('unhandledRejection', err => {
+      if (server) {
+        server.close(() => {
+          ErrorLog(err)
+          process.exit(1)
+        })
+      } else {
+        process.exit(1)
+      }
+    })
   } catch (error) {
-    console.log('not able to connect with db')
+    ErrorLog('not able to connect with db')
   }
 }
 
 connectToDb()
+
+process.on('SIGTERM', err => {
+  if (server) {
+    ErrorLog(err)
+    server.close()
+  }
+})
