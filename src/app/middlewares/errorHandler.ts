@@ -1,8 +1,11 @@
-import { ErrorRequestHandler } from 'express'
-import config from '../../config'
-import { IErrorResponse } from '../interfaces/error'
-import { validationError } from '../../errors/validationError'
-import ApiError from '../../errors/apiError'
+import { ErrorRequestHandler } from 'express';
+import config from '../../config';
+import { IErrorResponse } from '../interfaces/error';
+import { validationError } from '../../errors/validationError';
+import ApiError from '../../errors/apiError';
+import { ZodError } from 'zod';
+import { handleZodError } from '../../errors/handleZodError';
+import { ErrorLog } from '../../shared/log';
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   const errObj: IErrorResponse = {
@@ -10,26 +13,31 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     message: 'System Error',
     errors: [],
     stack: config.nodeEnvironment !== 'prod' ? err.stack : undefined,
-  }
+  };
 
-  let statusCode = 400
+  let statusCode = 400;
 
   if (err?.name === 'ValidationError') {
-    const { statusCode: code = 400, errors, message } = validationError(err)
-    statusCode = code
-    errObj.errors = errors
-    errObj.message = message
-  } else if (err instanceof Error) {
-    errObj.message = err?.message
-    errObj.errors = err?.message ? [{ path: '', message: err.message }] : []
+    const { statusCode: code = 400, errors, message } = validationError(err);
+    statusCode = code;
+    errObj.errors = errors;
+    errObj.message = message;
+  } else if (err instanceof ZodError) {
+    const { statusCode: code = 400, errors, message } = handleZodError(err);
+    statusCode = code;
+    errObj.errors = errors;
+    errObj.message = message;
   } else if (err instanceof ApiError) {
-    statusCode = err.statusCode
-    errObj.message = err?.message
-    errObj.errors = err?.message ? [{ path: '', message: err.message }] : []
+    statusCode = err.statusCode;
+    errObj.message = err?.message;
+    errObj.errors = err?.message ? [{ path: '', message: err.message }] : [];
+  } else if (err instanceof Error) {
+    errObj.message = err?.message;
+    errObj.errors = err?.message ? [{ path: '', message: err.message }] : [];
   }
+  ErrorLog(errObj);
+  res.status(statusCode).json(errObj);
+  next();
+};
 
-  res.status(statusCode).json(errObj)
-  next()
-}
-
-export default errorHandler
+export default errorHandler;
