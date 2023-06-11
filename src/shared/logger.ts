@@ -1,16 +1,16 @@
-import { createLogger, format, transports } from 'winston'
-import path from 'path'
-import moment from 'moment'
+import { createLogger, format, transports } from 'winston';
+import path from 'path';
+import moment from 'moment';
 
-import DailyRotateFile from 'winston-daily-rotate-file'
+import DailyRotateFile from 'winston-daily-rotate-file';
 
-const { combine, timestamp, printf } = format
+const { combine, timestamp, printf } = format;
 
 const myFormat = printf(({ level, message, timestamp }) => {
   return `level: ${level} \nmessage:${message} \ntime: ${moment(
     timestamp
-  ).format('DD MMM YYYY hh:mm a')} \n`
-})
+  ).format('DD MMM YYYY hh:mm a')} \n`;
+});
 
 const loggerSuccess = createLogger({
   level: 'info',
@@ -31,7 +31,7 @@ const loggerSuccess = createLogger({
       maxFiles: '14d',
     }),
   ],
-})
+});
 const loggerError = createLogger({
   level: 'error',
   format: combine(timestamp(), myFormat),
@@ -51,6 +51,6 @@ const loggerError = createLogger({
       maxFiles: '14d',
     }),
   ],
-})
+});
 
-export { loggerError, loggerSuccess }
+export { loggerError, loggerSuccess };
