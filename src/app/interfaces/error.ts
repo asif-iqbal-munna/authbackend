@@ -1,10 +1,10 @@
 export type IErrorResponse = {
-  status?: boolean
-  message: string
+  status?: boolean;
+  message: string;
   errors: {
-    path: string
-    message: string
-  }[]
-  stack?: unknown
-  statusCode?: number
-}
+    path: string | number;
+    message: string;
+  }[];
+  stack?: unknown;
+  statusCode?: number;
+};
