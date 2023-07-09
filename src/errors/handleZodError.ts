@@ -1,4 +1,4 @@
-import { IErrorResponse } from '../app/interfaces/error';
+import { IErrorResponse } from '../interfaces/error';
 import { ZodError, ZodIssue } from 'zod';
 
 export const handleZodError = (error: ZodError): IErrorResponse => {

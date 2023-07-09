@@ -1,12 +1,13 @@
 import { ErrorRequestHandler } from 'express';
 import config from '../../config';
-import { IErrorResponse } from '../interfaces/error';
+import { IErrorResponse } from '../../interfaces/error';
 import { validationError } from '../../errors/validationError';
 import ApiError from '../../errors/apiError';
 import { ZodError } from 'zod';
 import { handleZodError } from '../../errors/handleZodError';
 import { ErrorLog } from '../../shared/log';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   const errObj: IErrorResponse = {
     status: false,
@@ -27,6 +28,15 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
     statusCode = code;
     errObj.errors = errors;
     errObj.message = message;
+  } else if (err?.name === 'CastError') {
+    errObj.statusCode = 400;
+    errObj.message = 'Cast Error';
+    errObj.errors = [
+      {
+        path: err?.path,
+        message: 'Invalid Id',
+      },
+    ];
   } else if (err instanceof ApiError) {
     statusCode = err.statusCode;
     errObj.message = err?.message;
@@ -37,7 +47,6 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   }
   ErrorLog(errObj);
   res.status(statusCode).json(errObj);
-  next();
 };
 
 export default errorHandler;
