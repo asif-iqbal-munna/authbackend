@@ -10,5 +10,15 @@ router.post(
   validateRequest(AcademicSemesterValidation.createAcademicSemesterValidation),
   SemesterController.createSemester
 );
+router.get('/', SemesterController.getSemesters);
+
+router.patch(
+  '/update/:id',
+  validateRequest(AcademicSemesterValidation.updateAcademicSemesterValidation),
+  SemesterController.updateSingleSemester
+);
+
+router.get('/:id', SemesterController.getSingleSemester);
+router.delete('/delete/:id', SemesterController.deleteSingleSemester);
 
 export default router;

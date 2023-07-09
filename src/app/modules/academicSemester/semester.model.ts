@@ -12,7 +12,7 @@ const academicSemesterSchema = new Schema<IAcademicSemester>(
   {
     title: { type: String, required: true, enum: semesterNames },
     code: { type: String, required: true, enum: semesterCodes },
-    year: { type: Number, required: true },
+    year: { type: String, required: true },
     startMonth: { type: String, required: true, enum: semesterMonths },
     endMonth: { type: String, required: true, enum: semesterMonths },
   },

@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { IErrorResponse } from '../app/interfaces/error';
+import { IErrorResponse } from '../interfaces/error';
 
 export const validationError = (
   err: mongoose.Error.ValidationError

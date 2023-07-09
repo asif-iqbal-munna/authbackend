@@ -24,3 +24,5 @@ export const semesterTitleCodeMapper: {
   summer: '02',
   fall: '03',
 };
+
+export const semesterFields = ['title', 'code', 'year'];
